@@ -1,5 +1,7 @@
 <?php
 
+use App\Mcp\Middleware\SingleUserMiddleware;
+use App\Mcp\Servers\RemindServer;
 use Laravel\Mcp\Facades\Mcp;
 
-// Mcp::web('/mcp/demo', \App\Mcp\Servers\PublicServer::class);
+Mcp::web('/mcp', RemindServer::class)->middleware(SingleUserMiddleware::class);

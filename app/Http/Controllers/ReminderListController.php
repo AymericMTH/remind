@@ -6,6 +6,7 @@ use App\Actions\Lists\CreateList;
 use App\Actions\Lists\DeleteList;
 use App\Actions\Lists\DeleteStrategy;
 use App\Actions\Lists\ReorderLists;
+use App\Actions\Lists\UpdateList;
 use App\Http\Requests\StoreReminderList;
 use App\Http\Requests\UpdateReminderList;
 use App\Models\ReminderList;
@@ -22,9 +23,9 @@ class ReminderListController extends Controller
         return redirect()->back();
     }
 
-    public function update(UpdateReminderList $request, ReminderList $list): RedirectResponse
+    public function update(UpdateReminderList $request, ReminderList $list, UpdateList $action): RedirectResponse
     {
-        $list->update($request->validated());
+        $action->run($list, $request->validated());
 
         return redirect()->back();
     }

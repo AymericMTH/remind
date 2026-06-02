@@ -72,4 +72,15 @@ class ReminderControllerTest extends TestCase
 
         $this->assertLessThan($a->fresh()->position, $b->fresh()->position);
     }
+
+    public function test_create_rejects_list_owned_by_another_user(): void
+    {
+        $a = User::factory()->create();
+        $b = User::factory()->create();
+        $bsList = ReminderList::factory()->create(['user_id' => $b->id]);
+
+        $this->actingAs($a)
+            ->post('/reminders', ['list_id' => $bsList->id, 'title' => 'X'])
+            ->assertSessionHasErrors('list_id');
+    }
 }

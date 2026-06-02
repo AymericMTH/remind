@@ -58,4 +58,26 @@ class ReminderListControllerTest extends TestCase
 
         $this->assertLessThan($a->fresh()->position, $b->fresh()->position);
     }
+
+    public function test_user_cannot_update_another_users_list(): void
+    {
+        $a = User::factory()->create();
+        $b = User::factory()->create();
+        $bsList = ReminderList::factory()->create(['user_id' => $b->id]);
+
+        $this->actingAs($a)
+            ->put("/lists/{$bsList->id}", ['name' => 'hax'])
+            ->assertForbidden();
+    }
+
+    public function test_rename_rejects_case_insensitive_collision(): void
+    {
+        $user = User::factory()->create();
+        ReminderList::factory()->create(['user_id' => $user->id, 'name' => 'Work']);
+        $other = ReminderList::factory()->create(['user_id' => $user->id, 'name' => 'Side']);
+
+        $this->actingAs($user)
+            ->put("/lists/{$other->id}", ['name' => 'work'])
+            ->assertSessionHasErrors('name');
+    }
 }

@@ -106,6 +106,8 @@ All keys are optional and untyped beyond what's listed. The MCP fills as many as
 
 ## 5. Dashboard UX — two-pane
 
+> **Detailed dashboard design lives in [`dashboard-frontend.md`](dashboard-frontend.md).** The summary below is the high-level shape; the sub-spec covers component tree, interaction details, keyboard shortcuts, visual styling, and libraries.
+
 ```
 ┌────────────────┬──────────────────────────────────────────────┐
 │ SIDEBAR        │ MAIN PANE                                    │

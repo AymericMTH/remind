@@ -2,7 +2,7 @@
 
 A personal todo manager with both a web dashboard and a Claude Code MCP integration for capturing reminders mid-coding-session.
 
-**The source of truth for the product, data model, dashboard UX, and MCP design is [`docs/architecture.md`](docs/architecture.md). Read it before making non-trivial changes.** Update that file whenever a top-level decision changes.
+**The source of truth for the product, data model, and MCP design is [`docs/architecture.md`](docs/architecture.md). The dashboard frontend sub-spec is [`docs/dashboard-frontend.md`](docs/dashboard-frontend.md). Read both before making non-trivial changes.** Update them whenever a top-level decision changes.
 
 Key decisions to keep in mind at a glance (full rationale in `docs/architecture.md`):
 

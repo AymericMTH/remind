@@ -5,6 +5,7 @@ namespace App\Mcp\Servers;
 use App\Mcp\Tools\AddReminder;
 use App\Mcp\Tools\CreateProject;
 use App\Mcp\Tools\ListProjects;
+use App\Mcp\Tools\ListReminders;
 use Laravel\Mcp\Server;
 use Laravel\Mcp\Server\Attributes\Instructions;
 use Laravel\Mcp\Server\Attributes\Name;
@@ -21,5 +22,6 @@ class RemindServer extends Server
         ListProjects::class,
         CreateProject::class,
         AddReminder::class,
+        ListReminders::class,
     ];
 }

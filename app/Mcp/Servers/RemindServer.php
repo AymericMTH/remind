@@ -3,6 +3,7 @@
 namespace App\Mcp\Servers;
 
 use App\Mcp\Tools\AddReminder;
+use App\Mcp\Tools\CompleteReminder;
 use App\Mcp\Tools\CreateProject;
 use App\Mcp\Tools\ListProjects;
 use App\Mcp\Tools\ListReminders;
@@ -23,5 +24,6 @@ class RemindServer extends Server
         CreateProject::class,
         AddReminder::class,
         ListReminders::class,
+        CompleteReminder::class,
     ];
 }

@@ -7,6 +7,7 @@ use App\Mcp\Tools\CompleteReminder;
 use App\Mcp\Tools\CreateProject;
 use App\Mcp\Tools\ListProjects;
 use App\Mcp\Tools\ListReminders;
+use App\Mcp\Tools\UpdateReminder;
 use Laravel\Mcp\Server;
 use Laravel\Mcp\Server\Attributes\Instructions;
 use Laravel\Mcp\Server\Attributes\Name;
@@ -25,5 +26,6 @@ class RemindServer extends Server
         AddReminder::class,
         ListReminders::class,
         CompleteReminder::class,
+        UpdateReminder::class,
     ];
 }

@@ -39,4 +39,9 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasMany(ReminderList::class);
     }
+
+    public function reminders(): HasMany
+    {
+        return $this->hasMany(Reminder::class);
+    }
 }

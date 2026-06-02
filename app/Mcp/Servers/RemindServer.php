@@ -2,6 +2,7 @@
 
 namespace App\Mcp\Servers;
 
+use App\Mcp\Tools\AddReminder;
 use App\Mcp\Tools\CreateProject;
 use App\Mcp\Tools\ListProjects;
 use Laravel\Mcp\Server;
@@ -19,5 +20,6 @@ class RemindServer extends Server
     protected array $tools = [
         ListProjects::class,
         CreateProject::class,
+        AddReminder::class,
     ];
 }

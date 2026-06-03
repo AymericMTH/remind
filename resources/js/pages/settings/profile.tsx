@@ -34,7 +34,7 @@ export default function Profile({
                 <Heading
                     variant="small"
                     title="Profile"
-                    description="Update your name and email address"
+                    description="Update your name, username, and email address"
                 />
 
                 <Form
@@ -94,7 +94,7 @@ export default function Profile({
                                     defaultValue={auth.user.email}
                                     name="email"
                                     required
-                                    autoComplete="username"
+                                    autoComplete="email"
                                     placeholder="Email address"
                                 />
 

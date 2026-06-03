@@ -174,7 +174,7 @@ All keys are optional and untyped beyond what's listed. The MCP fills as many as
 
 - HTTP MCP served from the same Laravel app at `/mcp`, implemented with the **`laravel/mcp`** package.
 - **The MCP endpoint has no authentication** — no tokens, no headers, no session. Every MCP request implicitly acts as the single registered user, resolved via `User::sole()` (which fails loud if the app somehow ends up with 0 or 2+ users — surfaces account misconfiguration immediately rather than silently picking one).
-- The route is mounted in `routes/mcp.php` with a middleware that resolves the user via `User::sole()` and binds it into the request for tool handlers to use.
+- The route is mounted in `routes/ai.php` (the file `laravel/mcp` publishes via `vendor:publish --tag=ai-routes`; the spec earlier called it `routes/mcp.php` — same thing, package-defined name). Middleware resolves the user via `User::sole()` (wrapped in a `try/catch` that re-throws as `RuntimeException` so 0-or-2+-user states surface as 500, not 404) and binds it into the request for tool handlers to use.
 - **The dashboard side is still authenticated** via Fortify (login session). Only `/mcp` is open. Registration is disabled, so practically only the one bootstrapped user can sign in to the dashboard.
 
 ### 6.2 Tool surface (v1)
@@ -271,8 +271,9 @@ resources/js/pages/
 └── auth/…                              // existing
 
 routes/
-├── web.php       — dashboard + settings + auth
-└── mcp.php       — laravel/mcp routes, prefixed /mcp, no auth middleware
+├── web.php       — dashboard + lists + reminders (auth-gated; dashboard at `/dashboard`, `/` left as the starter welcome page)
+├── settings.php  — settings/profile/security + settings/mcp (auth-gated)
+└── ai.php        — laravel/mcp routes, prefixed /mcp, no auth middleware (published name)
 ```
 
 ## 10. Security notes
@@ -297,6 +298,14 @@ routes/
 - **No auth on MCP** — revisit if/when the host stops being a single-user trusted machine. Search for "no authentication" in this file to find the load-bearing decision.
 - **SQLite** — fine at the scale of "one user, thousands of reminders". Revisit if the app grows to multiple users with concurrent writes.
 
+## 13. Known issues (post-implementation)
+
+These were discovered during build but are out of scope to fix here. Track and address as standalone follow-ups.
+
+- **Production build fails** because `resources/js/pages/auth/register.tsx` imports from `@/routes/register`, which Wayfinder doesn't generate (registration is disabled — see Plan 1 Task 3). Predates Plan 2; not introduced by any task. Fix: delete `register.tsx` (and any `welcome.tsx` reference to a `register` route helper), or stub the missing route file. Dev runs fine via Vite; this only blocks `npm run build`.
+- **Dashboard row keyboard highlight** is wired into the page-level keyboard hook but the visual highlight ring on individual rows isn't plumbed through `MainPane → ReminderRow` yet. `↑/↓` move the internal cursor and the cheatsheet (`?`) works; visual highlight is a small follow-up.
+- **`docs/dashboard-frontend.md` references shadcn's `Calendar`** for the due-date picker, but the implementation uses a native `<input type="date">` for YAGNI. Confirmed working; spec was overcautious about library scope.
+
 ---
 
-_Last reviewed: 2026-06-01._
+_Last reviewed: 2026-06-03 (after Plan 1 + Plan 2)._

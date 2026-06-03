@@ -265,4 +265,16 @@ The plugin regenerates these on Vite startup; if a route is renamed or removed d
 
 ---
 
-_Last reviewed: 2026-06-02._
+## 15. Implementation notes (post-build)
+
+Small deviations from the spec that surfaced during implementation. None affect user-visible behavior.
+
+- **`useClipboard` hook surface** — the starter's `resources/js/hooks/use-clipboard.ts` returns a tuple `[copiedText, copy]`, not the object `{ copy, copied }` the spec implied. The Settings → MCP page adapts: `const [copiedText, copy] = useClipboard(); const copied = copiedText !== null;`.
+- **Settings layout is auto-applied via `app.tsx`** — pages under `pages/settings/` do NOT manually wrap themselves in `<SettingsLayout>`. The layout is injected through Inertia's app bootstrap; settings pages just return their inner panel and (optionally) set `MyPage.layout = { breadcrumbs: [...] }`.
+- **Due-date picker** uses native `<input type="date">` instead of the spec's planned shadcn `Calendar` + `Popover`. Removes the need for `@radix-ui/react-popover` and `react-day-picker`. Works fine in all desktop browsers; revisit only if we want a custom calendar look.
+- **Reminder row keyboard highlight** — the state slot exists (`highlightedId` in `MainPane`) but is currently a plain `const null`. The page-level `useKeyboardShortcuts` calls `moveHighlight` which updates a separate page-level state that isn't yet plumbed through `MainPane → ReminderRow`. Visual ring on `↑/↓` is a small follow-up, not a regression.
+- **Wayfinder typed helpers vs string literals** — Inertia `router.{post|put|delete}` calls in the dashboard use string paths (`/lists`, `/reminders`) rather than `@/actions/...` imports. Both wire-compatible; the spec strongly preferred Wayfinder. Swap one site at a time if a future refactor calls for it.
+
+---
+
+_Last reviewed: 2026-06-03 (after implementation)._

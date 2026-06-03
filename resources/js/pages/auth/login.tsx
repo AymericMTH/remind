@@ -32,16 +32,16 @@ export default function Login({ status, canResetPassword }: Props) {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">Username or email</Label>
                                 <Input
                                     id="email"
-                                    type="email"
+                                    type="text"
                                     name="email"
                                     required
                                     autoFocus
                                     tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
+                                    autoComplete="username"
+                                    placeholder="username or email@example.com"
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -62,10 +62,9 @@ export default function Login({ status, canResetPassword }: Props) {
                                 <PasswordInput
                                     id="password"
                                     name="password"
-                                    required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder="Password (leave empty if you don't have one)"
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -106,5 +105,5 @@ export default function Login({ status, canResetPassword }: Props) {
 
 Login.layout = {
     title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    description: 'Enter your username or email below to log in',
 };

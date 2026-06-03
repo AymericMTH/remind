@@ -45,6 +45,44 @@ The branded name is **Re:Mind** (the `:` is a typographic accent).
 
 Single codebase, single container. Dashboard and MCP share models, policies, validation, and the SQLite database. Nothing in the design relies on SQLite specifically; switching to Postgres later is a config change.
 
+### 3.1 Local setup (zero-config first boot)
+
+The repo is meant to clone-and-run. The Docker entrypoint (`docker-entrypoint.sh`, wired in the `Dockerfile`) idempotently bootstraps state on every container start:
+
+1. If `.env` is missing, copy `.env.example` → `.env`.
+2. If `APP_KEY` is empty, generate one (`php artisan key:generate --force`).
+3. If `database/database.sqlite` is missing, create an empty file.
+4. Run `php artisan migrate --force` (no-op once at head).
+5. Run `php artisan db:seed --force`. The seeder is `RemindUserSeeder`, which `User::updateOrCreate`s the bootstrap user from `REMIND_USER_NAME` / `REMIND_USER_EMAIL` / `REMIND_USER_PASSWORD` — so changing those in `.env` and restarting the container updates the user row in place.
+
+Onboarding from a fresh clone:
+
+```sh
+git clone <repo> && cd remind
+docker compose up -d --build
+# → open http://localhost:8000/login and sign in with the .env.example defaults
+#   (currently admin@remind.local / remind)
+```
+
+That's it. No host-side `composer install` or `npm install` required — the Dockerfile bakes `vendor/`, `node_modules/`, the built frontend (`public/build/`), and Wayfinder's generated TypeScript into the image. At runtime, `docker-compose.yml` declares **anonymous volumes** for those paths so the `.:/app` bind mount can't mask them with the (possibly empty) host directories:
+
+```yaml
+volumes:
+  - .:/app                 # source code (live editing)
+  - ./storage:/app/storage # persisted Laravel storage
+  - /app/vendor            # use image's PHP deps
+  - /app/node_modules      # use image's node deps
+  - /app/public/build      # use image's built frontend
+  - /app/resources/js/actions  # use image's Wayfinder output
+  - /app/resources/js/routes
+```
+
+You're still free to run `composer install` / `npm install` on the host for IDE autocomplete and host-side tests — the host copies live alongside the image's, neither overwrites the other.
+
+The image is also runnable standalone (`docker run -p 8000:8000 remind-app`) for portability — the entrypoint creates `.env`, `database/database.sqlite`, default user from scratch. Neither `.env` nor `database/database.sqlite` enter git (`/.env` in `.gitignore`, `database/.gitignore: *.sqlite*`) and both are excluded from the docker image via `.dockerignore`, so personal data never leaks.
+
+**Heads-up:** after changing PHP or JS dependencies and rebuilding the image, you must drop the anonymous volumes so the new image's vendor/node_modules is picked up: `docker compose down -v && docker compose up -d --build`. A plain restart reuses the old volumes.
+
 ## 4. Data model
 
 ### 4.1 Tables
@@ -240,6 +278,8 @@ Two discovery paths:
 - **MCP** — `laravel/mcp` (HTTP transport). Tool classes are thin wrappers around Action classes in `app/Actions/` so the MCP package can move without touching business logic.
 - **Markdown** — server-rendered with `league/commonmark` in safe mode (no inline HTML, no raw URLs from disallowed schemes), output further sanitized before being shipped to the client. The client never parses markdown.
 - **Docker** — a single `docker-compose.yml` with one **FrankenPHP** `app` service. Bind-mounts the project. No DB container — SQLite lives in the mounted volume. Ports: `8000:8000`. (Falls back to `nginx + php-fpm` if FrankenPHP causes issues; both are documented options.)
+- **Bootstrap entrypoint** — `docker-entrypoint.sh` (run before FrankenPHP starts) idempotently creates `.env`, generates `APP_KEY`, touches `database/database.sqlite`, then runs `migrate --force` + `db:seed --force`. Safe on every restart; preserves existing data. See §3.1.
+- **Self-contained image** — the Dockerfile runs `composer install`, `npm ci`, and `npm run build` so the image ships with `vendor/`, `node_modules/`, `public/build/`, and Wayfinder's generated TS. Dev composer deps are intentionally included (Boost et al. are auto-discovered in `bootstrap/cache` and the app won't boot without them).
 
 ## 9. Code organization
 
@@ -320,4 +360,4 @@ These were discovered during build but are out of scope to fix here. Track and a
 
 ---
 
-_Last reviewed: 2026-06-03 (after Plan 1 + Plan 2; subsequent edits: `/mcp` GET markdown override, register-UI removal)._
+_Last reviewed: 2026-06-03 (after Plan 1 + Plan 2; subsequent edits: `/mcp` GET markdown override, register-UI removal, zero-config docker entrypoint + self-contained image)._

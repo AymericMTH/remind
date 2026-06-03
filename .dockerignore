@@ -10,3 +10,9 @@ storage/framework/sessions
 storage/framework/views
 storage/logs
 .superpowers
+# Never bake a personal SQLite file into the image — the entrypoint creates an empty
+# one on first boot and runs migrations/seed against it.
+database/*.sqlite
+database/*.sqlite-journal
+# Local-only secrets; the entrypoint copies .env.example -> .env on first boot.
+.env

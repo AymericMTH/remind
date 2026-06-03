@@ -8,6 +8,15 @@ services:
     volumes:
       - .:/app
       - ./storage:/app/storage
+      # Anonymous volumes — keep the image's installed deps and built assets visible inside the
+      # container even though `.:/app` would otherwise mask them with the host's (possibly empty)
+      # dirs. The host stays free to run composer/npm independently for IDE tooling; the image
+      # is the single source of truth at runtime.
+      - /app/vendor
+      - /app/node_modules
+      - /app/public/build
+      - /app/resources/js/actions
+      - /app/resources/js/routes
     environment:
       APP_URL: http://localhost:8000
       DB_CONNECTION: sqlite

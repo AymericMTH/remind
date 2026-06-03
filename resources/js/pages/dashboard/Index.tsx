@@ -1,18 +1,64 @@
 import { Head } from '@inertiajs/react';
+import { useCallback, useRef, useState } from 'react';
+import { MainPane } from '@/components/dashboard/main-pane';
+import { ShortcutsCheatsheet } from '@/components/dashboard/shortcuts-cheatsheet';
+import { Sidebar } from '@/components/dashboard/sidebar';
+import { DashboardLayout } from '@/layouts/dashboard-layout';
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { useSelectedList } from '@/hooks/use-selected-list';
+import type { AddReminderRowHandle } from '@/components/dashboard/add-reminder-row';
+import type { DashboardPageProps } from '@/types/remind';
 
-export default function Dashboard({ lists }: { lists: Array<{ id: number; name: string }> }) {
+export default function Dashboard(props: DashboardPageProps) {
+    const { lists, selectedList, reminders, completedReminders, curatedColors } = props;
+    const { select } = useSelectedList();
+    const [, setHighlightIdx] = useState<number | null>(null);
+    const [cheatsheetOpen, setCheatsheetOpen] = useState(false);
+    const addRowRef = useRef<AddReminderRowHandle | null>(null);
+
+    const moveHighlight = useCallback(
+        (delta: number) => {
+            if (reminders.length === 0) return;
+            setHighlightIdx((cur) => {
+                const next = cur === null ? 0 : Math.max(0, Math.min(reminders.length - 1, cur + delta));
+                return next;
+            });
+        },
+        [reminders.length],
+    );
+
+    useKeyboardShortcuts({
+        onNew: () => addRowRef.current?.focus(),
+        onArrowUp: () => moveHighlight(-1),
+        onArrowDown: () => moveHighlight(1),
+        onEscape: () => setHighlightIdx(null),
+        onCheatsheet: () => setCheatsheetOpen(true),
+        onJumpToInbox: () => {
+            const inbox = lists.find((l) => l.is_inbox);
+            if (inbox) select(inbox.id);
+        },
+        onJumpToListAtIndex: (idx) => {
+            const l = lists[idx];
+            if (l) select(l.id);
+        },
+    });
+
     return (
-        <>
-            <Head title="Re:Mind" />
-            <div className="p-6">
-                <h1 className="text-xl font-semibold">Re:Mind</h1>
-                <ul className="mt-4 space-y-1">
-                    {lists.map((l) => (
-                        <li key={l.id}>📋 {l.name}</li>
-                    ))}
-                </ul>
-                <p className="mt-6 text-sm text-gray-500">Full dashboard ships in Plan 2.</p>
-            </div>
-        </>
+        <DashboardLayout>
+            <Head title={`Re:Mind — ${selectedList.name}`} />
+            <Sidebar
+                lists={lists}
+                selectedListId={selectedList.id}
+                curatedColors={curatedColors}
+                onSelect={select}
+            />
+            <MainPane
+                list={selectedList}
+                reminders={reminders}
+                completedReminders={completedReminders}
+                addRef={addRowRef}
+            />
+            <ShortcutsCheatsheet open={cheatsheetOpen} onClose={() => setCheatsheetOpen(false)} />
+        </DashboardLayout>
     );
 }

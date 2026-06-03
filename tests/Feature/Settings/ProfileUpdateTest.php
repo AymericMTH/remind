@@ -96,4 +96,55 @@ class ProfileUpdateTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_username_can_be_updated()
+    {
+        $user = User::factory()->create(['username' => 'olduser']);
+
+        $response = $this
+            ->actingAs($user)
+            ->from(route('profile.edit'))
+            ->patch(route('profile.update'), [
+                'name' => $user->name,
+                'username' => 'newuser',
+                'email' => $user->email,
+            ]);
+
+        $response->assertSessionHasNoErrors()->assertRedirect(route('profile.edit'));
+        $this->assertSame('newuser', $user->refresh()->username);
+    }
+
+    public function test_username_must_be_unique_across_users()
+    {
+        User::factory()->create(['username' => 'taken']);
+        $user = User::factory()->create(['username' => 'mine']);
+
+        $response = $this
+            ->actingAs($user)
+            ->from(route('profile.edit'))
+            ->patch(route('profile.update'), [
+                'name' => $user->name,
+                'username' => 'taken',
+                'email' => $user->email,
+            ]);
+
+        $response->assertSessionHasErrors('username');
+    }
+
+    public function test_username_may_be_cleared()
+    {
+        $user = User::factory()->create(['username' => 'something']);
+
+        $response = $this
+            ->actingAs($user)
+            ->from(route('profile.edit'))
+            ->patch(route('profile.update'), [
+                'name' => $user->name,
+                'username' => '',
+                'email' => $user->email,
+            ]);
+
+        $response->assertSessionHasNoErrors();
+        $this->assertNull($user->refresh()->username);
+    }
 }

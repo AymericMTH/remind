@@ -8,16 +8,16 @@ import type { McpPageProps } from '@/types/remind';
 
 export default function McpSettings({ mcpUrl, tools }: McpPageProps) {
     const [copiedText, copy] = useClipboard();
-    const copied = copiedText !== null;
 
+    const cliCommand = `claude mcp add --scope user --transport http remind ${mcpUrl}`;
     const snippet = JSON.stringify(
         { mcpServers: { remind: { type: 'http', url: mcpUrl } } },
         null,
         2,
     );
 
-    async function copySnippet() {
-        await copy(snippet);
+    async function copyValue(value: string) {
+        await copy(value);
         toast.success('Copied to clipboard');
     }
 
@@ -33,15 +33,39 @@ export default function McpSettings({ mcpUrl, tools }: McpPageProps) {
                         Claude Code MCP setup
                     </h2>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        Add this to{' '}
+                        Run the CLI one-liner, or add the JSON snippet to{' '}
                         <code className="font-mono text-xs">
                             ~/.claude.json
                         </code>{' '}
                         or a project{' '}
-                        <code className="font-mono text-xs">.mcp.json</code> to
-                        make Claude Code talk to Re:Mind.
+                        <code className="font-mono text-xs">.mcp.json</code>.
                     </p>
                 </header>
+
+                <div className="rounded border border-input bg-muted/30">
+                    <div className="flex items-center justify-between border-b border-input px-3 py-2">
+                        <span className="text-xs tracking-wider text-muted-foreground uppercase">
+                            Claude Code CLI
+                        </span>
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => copyValue(cliCommand)}
+                            className="gap-1"
+                        >
+                            {copiedText === cliCommand ? (
+                                <Check className="h-3.5 w-3.5" />
+                            ) : (
+                                <Copy className="h-3.5 w-3.5" />
+                            )}
+                            {copiedText === cliCommand ? 'Copied' : 'Copy'}
+                        </Button>
+                    </div>
+                    <pre className="overflow-x-auto px-3 py-3 font-mono text-xs">
+                        {cliCommand}
+                    </pre>
+                </div>
 
                 <div className="rounded border border-input bg-muted/30">
                     <div className="flex items-center justify-between border-b border-input px-3 py-2">
@@ -52,15 +76,15 @@ export default function McpSettings({ mcpUrl, tools }: McpPageProps) {
                             type="button"
                             size="sm"
                             variant="ghost"
-                            onClick={copySnippet}
+                            onClick={() => copyValue(snippet)}
                             className="gap-1"
                         >
-                            {copied ? (
+                            {copiedText === snippet ? (
                                 <Check className="h-3.5 w-3.5" />
                             ) : (
                                 <Copy className="h-3.5 w-3.5" />
                             )}
-                            {copied ? 'Copied' : 'Copy'}
+                            {copiedText === snippet ? 'Copied' : 'Copy'}
                         </Button>
                     </div>
                     <pre className="overflow-x-auto px-3 py-3 font-mono text-xs">

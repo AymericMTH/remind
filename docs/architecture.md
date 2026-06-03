@@ -201,15 +201,27 @@ Public-API naming: tools call it **`project`** (since lists are projects in this
 
 ### 6.4 Discovery
 
-Settings → MCP prints the exact JSON snippet for `~/.claude.json` or a project `.mcp.json`, e.g.:
+Two discovery paths:
 
-```json
-{
-  "mcpServers": {
-    "remind": { "type": "http", "url": "http://localhost:8000/mcp" }
-  }
-}
-```
+1. **In-app**: Settings → MCP shows two equivalent ways to wire up the client:
+
+   - The Claude Code CLI one-liner:
+
+     ```sh
+     claude mcp add --scope user --transport http remind http://localhost:8000/mcp
+     ```
+
+   - Or the exact JSON snippet for `~/.claude.json` / a project `.mcp.json`:
+
+     ```json
+     {
+       "mcpServers": {
+         "remind": { "type": "http", "url": "http://localhost:8000/mcp" }
+       }
+     }
+     ```
+
+2. **Out-of-app**: a plain `GET /mcp` (e.g. opening `http://localhost:8000/mcp` in a browser) returns a `text/markdown` quick guide — setup snippet, tool table, key gotchas — instead of `laravel/mcp`'s stock `405 Allow: POST`. The override lives in `routes/ai.php`, registered after `Mcp::web()` so it shadows the vendor GET handler. JSON-RPC `POST` traffic is unaffected.
 
 ## 7. Mutations and edge cases
 
@@ -302,10 +314,10 @@ routes/
 
 These were discovered during build but are out of scope to fix here. Track and address as standalone follow-ups.
 
-- **Production build fails** because `resources/js/pages/auth/register.tsx` imports from `@/routes/register`, which Wayfinder doesn't generate (registration is disabled — see Plan 1 Task 3). Predates Plan 2; not introduced by any task. Fix: delete `register.tsx` (and any `welcome.tsx` reference to a `register` route helper), or stub the missing route file. Dev runs fine via Vite; this only blocks `npm run build`.
+- ~~**Production build fails** because `resources/js/pages/auth/register.tsx` imports from `@/routes/register`, which Wayfinder doesn't generate (registration is disabled).~~ **Fixed 2026-06-03:** deleted `auth/register.tsx` and stripped the `register` imports/links from `welcome.tsx` and `auth/login.tsx`.
 - **Dashboard row keyboard highlight** is wired into the page-level keyboard hook but the visual highlight ring on individual rows isn't plumbed through `MainPane → ReminderRow` yet. `↑/↓` move the internal cursor and the cheatsheet (`?`) works; visual highlight is a small follow-up.
 - **`docs/dashboard-frontend.md` references shadcn's `Calendar`** for the due-date picker, but the implementation uses a native `<input type="date">` for YAGNI. Confirmed working; spec was overcautious about library scope.
 
 ---
 
-_Last reviewed: 2026-06-03 (after Plan 1 + Plan 2)._
+_Last reviewed: 2026-06-03 (after Plan 1 + Plan 2; subsequent edits: `/mcp` GET markdown override, register-UI removal)._

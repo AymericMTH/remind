@@ -16,9 +16,18 @@ export type Shortcuts = {
 
 function isTextInputFocused(): boolean {
     const el = document.activeElement;
-    if (!el) return false;
+
+    if (!el) {
+        return false;
+    }
+
     const tag = el.tagName;
-    return tag === 'INPUT' || tag === 'TEXTAREA' || (el as HTMLElement).isContentEditable;
+
+    return (
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        (el as HTMLElement).isContentEditable
+    );
 }
 
 export function useKeyboardShortcuts(s: Shortcuts) {
@@ -29,23 +38,35 @@ export function useKeyboardShortcuts(s: Shortcuts) {
         function onKey(e: KeyboardEvent) {
             if (e.key === 'Escape') {
                 s.onEscape?.();
+
                 return;
             }
-            if (isTextInputFocused()) return;
 
-            const armed = gArmedAt.current !== null && Date.now() - gArmedAt.current < G_WINDOW_MS;
+            if (isTextInputFocused()) {
+                return;
+            }
+
+            const armed =
+                gArmedAt.current !== null &&
+                Date.now() - gArmedAt.current < G_WINDOW_MS;
+
             if (armed) {
                 gArmedAt.current = null;
+
                 if (e.key === 'i') {
                     s.onJumpToInbox?.();
                     e.preventDefault();
+
                     return;
                 }
+
                 if (/^[1-9]$/.test(e.key)) {
                     s.onJumpToListAtIndex?.(parseInt(e.key, 10) - 1);
                     e.preventDefault();
+
                     return;
                 }
+
                 return;
             }
 
@@ -87,6 +108,7 @@ export function useKeyboardShortcuts(s: Shortcuts) {
             }
         }
         document.addEventListener('keydown', onKey);
+
         return () => document.removeEventListener('keydown', onKey);
     }, [s]);
 }

@@ -1,7 +1,7 @@
-import { Checkbox } from '@/components/ui/checkbox';
 import { router } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GripVertical } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import type { Reminder } from '@/types/remind';
 import { ContextChip } from './context-chip';
 import { DueDateBadge } from './due-date-badge';
@@ -36,18 +36,27 @@ export function ReminderRow({
         <div data-reminder-id={reminder.id}>
             <div
                 onClick={(e) => {
-                    if ((e.target as HTMLElement).closest('button, input, [data-no-expand]')) return;
+                    if (
+                        (e.target as HTMLElement).closest(
+                            'button, input, [data-no-expand]',
+                        )
+                    ) {
+                        return;
+                    }
+
                     onToggleExpand();
                 }}
-                className={`group flex items-center gap-3 px-4 py-2.5 border-b border-amber-100/60 dark:border-amber-900/30 hover:bg-amber-50/50 dark:hover:bg-amber-950/10 cursor-pointer ${
-                    highlighted ? 'ring-2 ring-amber-300 dark:ring-amber-700 ring-inset' : ''
+                className={`group flex cursor-pointer items-center gap-3 border-b border-amber-100/60 px-4 py-2.5 hover:bg-amber-50/50 dark:border-amber-900/30 dark:hover:bg-amber-950/10 ${
+                    highlighted
+                        ? 'ring-2 ring-amber-300 ring-inset dark:ring-amber-700'
+                        : ''
                 }`}
             >
                 <button
                     type="button"
                     {...dragHandleProps}
                     data-no-expand
-                    className="opacity-0 group-hover:opacity-50 cursor-grab active:cursor-grabbing"
+                    className="cursor-grab opacity-0 group-hover:opacity-50 active:cursor-grabbing"
                     aria-label="Drag to reorder"
                 >
                     <GripVertical className="h-4 w-4" />
@@ -58,7 +67,9 @@ export function ReminderRow({
                     data-no-expand
                     onClick={(e) => e.stopPropagation()}
                 />
-                <span className="flex-1 text-sm truncate">{reminder.title}</span>
+                <span className="flex-1 truncate text-sm">
+                    {reminder.title}
+                </span>
                 <ContextChip context={reminder.context} />
                 <DueDateBadge date={reminder.soft_due_date} />
             </div>

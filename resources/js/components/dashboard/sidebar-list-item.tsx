@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
 import { MoreHorizontal } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import type { ReminderList } from '@/types/remind';
 import { ColorPicker } from './color-picker';
 import { DeleteListDialog } from './delete-list-dialog';
@@ -15,7 +15,13 @@ type Props = {
     onSelect: () => void;
 };
 
-export function SidebarListItem({ list, selected, reminderCount, curatedColors, onSelect }: Props) {
+export function SidebarListItem({
+    list,
+    selected,
+    reminderCount,
+    curatedColors,
+    onSelect,
+}: Props) {
     const [renaming, setRenaming] = useState(false);
     const [draft, setDraft] = useState(list.name);
     const [colorOpen, setColorOpen] = useState(false);
@@ -23,27 +29,40 @@ export function SidebarListItem({ list, selected, reminderCount, curatedColors, 
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (renaming) inputRef.current?.select();
+        if (renaming) {
+            inputRef.current?.select();
+        }
     }, [renaming]);
 
     function saveName() {
         const name = draft.trim();
+
         if (!name || name === list.name) {
             setRenaming(false);
             setDraft(list.name);
+
             return;
         }
-        router.put(`/lists/${list.id}`, { name }, {
-            preserveScroll: true,
-            onSuccess: () => setRenaming(false),
-        });
+
+        router.put(
+            `/lists/${list.id}`,
+            { name },
+            {
+                preserveScroll: true,
+                onSuccess: () => setRenaming(false),
+            },
+        );
     }
 
     function saveColor(color: string | null) {
-        router.put(`/lists/${list.id}`, { color }, {
-            preserveScroll: true,
-            onFinish: () => setColorOpen(false),
-        });
+        router.put(
+            `/lists/${list.id}`,
+            { color },
+            {
+                preserveScroll: true,
+                onFinish: () => setColorOpen(false),
+            },
+        );
     }
 
     const dot = list.is_inbox ? '📥' : null;
@@ -54,19 +73,27 @@ export function SidebarListItem({ list, selected, reminderCount, curatedColors, 
                 onClick={() => !renaming && onSelect()}
                 onContextMenu={(e) => {
                     e.preventDefault();
-                    (e.currentTarget.querySelector('[data-context-trigger]') as HTMLButtonElement | null)?.click();
+                    (
+                        e.currentTarget.querySelector(
+                            '[data-context-trigger]',
+                        ) as HTMLButtonElement | null
+                    )?.click();
                 }}
-                style={selected && !list.is_inbox && list.color ? { borderLeftColor: list.color } : undefined}
-                className={`group flex items-center gap-2 px-2 py-1.5 -mx-2 rounded text-sm cursor-pointer border-l-[3px] ${
+                style={
+                    selected && !list.is_inbox && list.color
+                        ? { borderLeftColor: list.color }
+                        : undefined
+                }
+                className={`group -mx-2 flex cursor-pointer items-center gap-2 rounded border-l-[3px] px-2 py-1.5 text-sm ${
                     selected
-                        ? 'bg-amber-100 dark:bg-amber-900/30 border-l-current'
+                        ? 'border-l-current bg-amber-100 dark:bg-amber-900/30'
                         : 'border-l-transparent hover:bg-amber-50 dark:hover:bg-amber-950/20'
                 }`}
             >
                 <span className="text-sm">
                     {dot ?? (
                         <span
-                            className="inline-block w-2 h-2 rounded-full"
+                            className="inline-block h-2 w-2 rounded-full"
                             style={{ backgroundColor: list.color ?? '#999' }}
                         />
                     )}
@@ -78,19 +105,24 @@ export function SidebarListItem({ list, selected, reminderCount, curatedColors, 
                         onChange={(e) => setDraft(e.target.value)}
                         onBlur={saveName}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter') saveName();
+                            if (e.key === 'Enter') {
+                                saveName();
+                            }
+
                             if (e.key === 'Escape') {
                                 setRenaming(false);
                                 setDraft(list.name);
                             }
                         }}
                         onClick={(e) => e.stopPropagation()}
-                        className="flex-1 bg-transparent text-sm outline-none border-b border-amber-500"
+                        className="flex-1 border-b border-amber-500 bg-transparent text-sm outline-none"
                     />
                 ) : (
                     <span className="flex-1 truncate">{list.name}</span>
                 )}
-                <span className="text-xs text-muted-foreground tabular-nums">{reminderCount}</span>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                    {reminderCount}
+                </span>
                 {!list.is_inbox && (
                     <ListContextMenu
                         onRename={() => setRenaming(true)}
@@ -101,7 +133,7 @@ export function SidebarListItem({ list, selected, reminderCount, curatedColors, 
                             data-context-trigger
                             variant="ghost"
                             size="icon"
-                            className="h-5 w-5 opacity-0 group-hover:opacity-100 -mr-1"
+                            className="-mr-1 h-5 w-5 opacity-0 group-hover:opacity-100"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <MoreHorizontal className="h-3 w-3" />
@@ -111,8 +143,12 @@ export function SidebarListItem({ list, selected, reminderCount, curatedColors, 
             </div>
 
             {colorOpen && !list.is_inbox && (
-                <div className="px-2 py-2 -mx-2 bg-amber-50 dark:bg-amber-950/20 rounded">
-                    <ColorPicker value={list.color} onChange={saveColor} swatches={curatedColors} />
+                <div className="-mx-2 rounded bg-amber-50 px-2 py-2 dark:bg-amber-950/20">
+                    <ColorPicker
+                        value={list.color}
+                        onChange={saveColor}
+                        swatches={curatedColors}
+                    />
                 </div>
             )}
 

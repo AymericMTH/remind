@@ -30,8 +30,13 @@ export function ShortcutsCheatsheet({ open, onClose }: Props) {
                 <table className="w-full text-sm">
                     <tbody>
                         {ROWS.map(([k, label]) => (
-                            <tr key={k} className="border-b border-amber-100/60 dark:border-amber-900/30 last:border-0">
-                                <td className="py-1.5 pr-4 font-mono text-xs text-amber-700 dark:text-amber-300 whitespace-nowrap">{k}</td>
+                            <tr
+                                key={k}
+                                className="border-b border-amber-100/60 last:border-0 dark:border-amber-900/30"
+                            >
+                                <td className="py-1.5 pr-4 font-mono text-xs whitespace-nowrap text-amber-700 dark:text-amber-300">
+                                    {k}
+                                </td>
                                 <td className="py-1.5">{label}</td>
                             </tr>
                         ))}

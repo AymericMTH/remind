@@ -26,14 +26,21 @@ export function SidebarNewListInput({ curatedColors }: Props) {
 
     function submit() {
         const trimmed = name.trim();
+
         if (!trimmed) {
             cancel();
+
             return;
         }
-        router.post('/lists', { name: trimmed, color }, {
-            preserveScroll: true,
-            onSuccess: () => cancel(),
-        });
+
+        router.post(
+            '/lists',
+            { name: trimmed, color },
+            {
+                preserveScroll: true,
+                onSuccess: () => cancel(),
+            },
+        );
     }
 
     if (!open) {
@@ -41,7 +48,7 @@ export function SidebarNewListInput({ curatedColors }: Props) {
             <button
                 type="button"
                 onClick={start}
-                className="flex items-center gap-2 px-2 py-1.5 -mx-2 mt-1 rounded text-sm text-muted-foreground hover:bg-amber-50 dark:hover:bg-amber-950/20 w-[calc(100%+1rem)]"
+                className="-mx-2 mt-1 flex w-[calc(100%+1rem)] items-center gap-2 rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-amber-50 dark:hover:bg-amber-950/20"
             >
                 <Plus className="h-3.5 w-3.5" />
                 <span>New list</span>
@@ -50,19 +57,28 @@ export function SidebarNewListInput({ curatedColors }: Props) {
     }
 
     return (
-        <div className="px-2 py-2 -mx-2 mt-1 bg-amber-50 dark:bg-amber-950/20 rounded space-y-2">
+        <div className="-mx-2 mt-1 space-y-2 rounded bg-amber-50 px-2 py-2 dark:bg-amber-950/20">
             <input
                 ref={inputRef}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="List name"
                 onKeyDown={(e) => {
-                    if (e.key === 'Enter') submit();
-                    if (e.key === 'Escape') cancel();
+                    if (e.key === 'Enter') {
+                        submit();
+                    }
+
+                    if (e.key === 'Escape') {
+                        cancel();
+                    }
                 }}
-                className="w-full text-sm bg-background border border-input rounded px-2 py-1"
+                className="w-full rounded border border-input bg-background px-2 py-1 text-sm"
             />
-            <ColorPicker value={color} onChange={setColor} swatches={curatedColors} />
+            <ColorPicker
+                value={color}
+                onChange={setColor}
+                swatches={curatedColors}
+            />
         </div>
     );
 }

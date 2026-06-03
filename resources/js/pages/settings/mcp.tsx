@@ -29,35 +29,61 @@ export default function McpSettings({ mcpUrl, tools }: McpPageProps) {
 
             <div className="space-y-6">
                 <header>
-                    <h2 className="text-lg font-semibold tracking-tight">Claude Code MCP setup</h2>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        Add this to <code className="font-mono text-xs">~/.claude.json</code> or a project{' '}
-                        <code className="font-mono text-xs">.mcp.json</code> to make Claude Code talk to Re:Mind.
+                    <h2 className="text-lg font-semibold tracking-tight">
+                        Claude Code MCP setup
+                    </h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        Add this to{' '}
+                        <code className="font-mono text-xs">
+                            ~/.claude.json
+                        </code>{' '}
+                        or a project{' '}
+                        <code className="font-mono text-xs">.mcp.json</code> to
+                        make Claude Code talk to Re:Mind.
                     </p>
                 </header>
 
                 <div className="rounded border border-input bg-muted/30">
-                    <div className="flex justify-between items-center px-3 py-2 border-b border-input">
-                        <span className="text-xs uppercase tracking-wider text-muted-foreground">.mcp.json</span>
-                        <Button type="button" size="sm" variant="ghost" onClick={copySnippet} className="gap-1">
-                            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                    <div className="flex items-center justify-between border-b border-input px-3 py-2">
+                        <span className="text-xs tracking-wider text-muted-foreground uppercase">
+                            .mcp.json
+                        </span>
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={copySnippet}
+                            className="gap-1"
+                        >
+                            {copied ? (
+                                <Check className="h-3.5 w-3.5" />
+                            ) : (
+                                <Copy className="h-3.5 w-3.5" />
+                            )}
                             {copied ? 'Copied' : 'Copy'}
                         </Button>
                     </div>
-                    <pre className="px-3 py-3 text-xs font-mono overflow-x-auto">{snippet}</pre>
+                    <pre className="overflow-x-auto px-3 py-3 font-mono text-xs">
+                        {snippet}
+                    </pre>
                 </div>
 
                 <section>
-                    <h3 className="text-sm font-medium mb-2">What Claude can do</h3>
-                    <ul className="text-sm text-muted-foreground space-y-1">
+                    <h3 className="mb-2 text-sm font-medium">
+                        What Claude can do
+                    </h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
                         {tools.map((t) => (
-                            <li key={t} className="font-mono text-xs">&middot; {t}</li>
+                            <li key={t} className="font-mono text-xs">
+                                &middot; {t}
+                            </li>
                         ))}
                     </ul>
                 </section>
 
-                <p className="text-xs text-muted-foreground border-t border-input pt-3">
-                    Re:Mind&rsquo;s MCP endpoint is unauthenticated by design. Only expose this app on loopback or a private network.
+                <p className="border-t border-input pt-3 text-xs text-muted-foreground">
+                    Re:Mind&rsquo;s MCP endpoint is unauthenticated by design.
+                    Only expose this app on loopback or a private network.
                 </p>
             </div>
         </>

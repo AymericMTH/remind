@@ -1,7 +1,9 @@
 import type { ReminderContext } from '@/types/remind';
 
 export function ContextChip({ context }: { context: ReminderContext | null }) {
-    if (!context) return null;
+    if (!context) {
+        return null;
+    }
 
     const label =
         context.repo_label ??
@@ -13,10 +15,12 @@ export function ContextChip({ context }: { context: ReminderContext | null }) {
 
     const text = [label, fileFragment].filter(Boolean).join(' · ');
 
-    if (!text) return null;
+    if (!text) {
+        return null;
+    }
 
     return (
-        <span className="font-mono text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200 rounded px-1.5 py-0.5 truncate max-w-[280px]">
+        <span className="max-w-[280px] truncate rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs text-amber-900 dark:bg-amber-900/30 dark:text-amber-200">
             📁 {text}
         </span>
     );

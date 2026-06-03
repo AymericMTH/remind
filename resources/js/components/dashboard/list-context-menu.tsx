@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -5,7 +6,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { ReactNode } from 'react';
 
 type Props = {
     children: ReactNode;
@@ -15,7 +15,13 @@ type Props = {
     onDelete: () => void;
 };
 
-export function ListContextMenu({ children, disabled, onRename, onChangeColor, onDelete }: Props) {
+export function ListContextMenu({
+    children,
+    disabled,
+    onRename,
+    onChangeColor,
+    onDelete,
+}: Props) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild disabled={disabled}>
@@ -23,11 +29,13 @@ export function ListContextMenu({ children, disabled, onRename, onChangeColor, o
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem onSelect={onRename}>Rename</DropdownMenuItem>
-                <DropdownMenuItem onSelect={onChangeColor}>Change color</DropdownMenuItem>
+                <DropdownMenuItem onSelect={onChangeColor}>
+                    Change color
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                     onSelect={onDelete}
-                    className="text-red-600 focus:text-red-700 focus:bg-red-50 dark:focus:bg-red-950/30"
+                    className="text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950/30"
                 >
                     Delete
                 </DropdownMenuItem>

@@ -4,9 +4,13 @@ import {
     PointerSensor,
     useSensor,
     useSensors,
-    type DragEndEvent,
 } from '@dnd-kit/core';
-import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+    SortableContext,
+    useSortable,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { router } from '@inertiajs/react';
 import type { ReminderList } from '@/types/remind';
@@ -35,7 +39,12 @@ function SortableItem({
     };
 
     return (
-        <div ref={sortable.setNodeRef} style={style} {...sortable.attributes} {...sortable.listeners}>
+        <div
+            ref={sortable.setNodeRef}
+            style={style}
+            {...sortable.attributes}
+            {...sortable.listeners}
+        >
             <SidebarListItem
                 list={list}
                 selected={selected}
@@ -54,27 +63,52 @@ type Props = {
     onSelect: (id: number) => void;
 };
 
-export function Sidebar({ lists, selectedListId, curatedColors, onSelect }: Props) {
-    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+export function Sidebar({
+    lists,
+    selectedListId,
+    curatedColors,
+    onSelect,
+}: Props) {
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    );
 
     function onDragEnd(e: DragEndEvent) {
-        if (!e.over || e.active.id === e.over.id) return;
+        if (!e.over || e.active.id === e.over.id) {
+            return;
+        }
+
         const oldIdx = lists.findIndex((l) => l.id === e.active.id);
         const newIdx = lists.findIndex((l) => l.id === e.over!.id);
-        if (oldIdx === -1 || newIdx === -1) return;
+
+        if (oldIdx === -1 || newIdx === -1) {
+            return;
+        }
+
         const order = lists.slice();
         order.splice(newIdx, 0, order.splice(oldIdx, 1)[0]);
-        router.put('/lists/reorder', { order: order.map((l) => l.id) }, { preserveScroll: true });
+        router.put(
+            '/lists/reorder',
+            { order: order.map((l) => l.id) },
+            { preserveScroll: true },
+        );
     }
 
     return (
-        <aside className="w-60 shrink-0 bg-amber-50/80 dark:bg-amber-950/20 border-r border-amber-100 dark:border-amber-900/30 px-4 py-4 flex flex-col">
-            <BrandWordmark className="text-base mb-5" />
-            <div className="text-xs uppercase tracking-widest text-amber-900/50 dark:text-amber-200/50 mb-2">
+        <aside className="flex w-60 shrink-0 flex-col border-r border-amber-100 bg-amber-50/80 px-4 py-4 dark:border-amber-900/30 dark:bg-amber-950/20">
+            <BrandWordmark className="mb-5 text-base" />
+            <div className="mb-2 text-xs tracking-widest text-amber-900/50 uppercase dark:text-amber-200/50">
                 Projects
             </div>
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-                <SortableContext items={lists.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={onDragEnd}
+            >
+                <SortableContext
+                    items={lists.map((l) => l.id)}
+                    strategy={verticalListSortingStrategy}
+                >
                     <div className="space-y-0.5">
                         {lists.map((l) => (
                             <SortableItem

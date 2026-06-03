@@ -1,3 +1,5 @@
+import { router } from '@inertiajs/react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -8,8 +10,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { router } from '@inertiajs/react';
-import { useState } from 'react';
 import type { ReminderList } from '@/types/remind';
 
 type Strategy = 'move_to_inbox' | 'cascade';
@@ -21,7 +21,12 @@ type Props = {
     reminderCount: number;
 };
 
-export function DeleteListDialog({ open, onClose, list, reminderCount }: Props) {
+export function DeleteListDialog({
+    open,
+    onClose,
+    list,
+    reminderCount,
+}: Props) {
     const [strategy, setStrategy] = useState<Strategy>('move_to_inbox');
     const [submitting, setSubmitting] = useState(false);
 
@@ -42,11 +47,14 @@ export function DeleteListDialog({ open, onClose, list, reminderCount }: Props) 
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Delete &quot;{list.name}&quot;</DialogTitle>
-                    <DialogDescription>What should happen to the {reminderCount} reminder{reminderCount === 1 ? '' : 's'} in this list?</DialogDescription>
+                    <DialogDescription>
+                        What should happen to the {reminderCount} reminder
+                        {reminderCount === 1 ? '' : 's'} in this list?
+                    </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-3 my-2">
-                    <Label className="flex items-start gap-3 cursor-pointer">
+                <div className="my-2 space-y-3">
+                    <Label className="flex cursor-pointer items-start gap-3">
                         <input
                             type="radio"
                             name="strategy"
@@ -56,11 +64,15 @@ export function DeleteListDialog({ open, onClose, list, reminderCount }: Props) 
                             className="mt-1"
                         />
                         <span>
-                            <span className="block font-medium">Move them to Inbox</span>
-                            <span className="block text-sm text-muted-foreground">The list disappears, reminders move to Inbox.</span>
+                            <span className="block font-medium">
+                                Move them to Inbox
+                            </span>
+                            <span className="block text-sm text-muted-foreground">
+                                The list disappears, reminders move to Inbox.
+                            </span>
                         </span>
                     </Label>
-                    <Label className="flex items-start gap-3 cursor-pointer">
+                    <Label className="flex cursor-pointer items-start gap-3">
                         <input
                             type="radio"
                             name="strategy"
@@ -70,18 +82,36 @@ export function DeleteListDialog({ open, onClose, list, reminderCount }: Props) 
                             className="mt-1"
                         />
                         <span>
-                            <span className="block font-medium text-red-700 dark:text-red-400">Delete list and all reminders</span>
-                            <span className="block text-sm text-muted-foreground">Permanent. Cannot be undone.</span>
+                            <span className="block font-medium text-red-700 dark:text-red-400">
+                                Delete list and all reminders
+                            </span>
+                            <span className="block text-sm text-muted-foreground">
+                                Permanent. Cannot be undone.
+                            </span>
                         </span>
                     </Label>
                 </div>
 
                 <DialogFooter>
-                    <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onClose}
+                        disabled={submitting}
+                    >
                         Cancel
                     </Button>
-                    <Button type="button" variant={strategy === 'cascade' ? 'destructive' : 'default'} onClick={confirm} disabled={submitting}>
-                        {strategy === 'cascade' ? 'Delete everything' : 'Move and delete'}
+                    <Button
+                        type="button"
+                        variant={
+                            strategy === 'cascade' ? 'destructive' : 'default'
+                        }
+                        onClick={confirm}
+                        disabled={submitting}
+                    >
+                        {strategy === 'cascade'
+                            ? 'Delete everything'
+                            : 'Move and delete'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

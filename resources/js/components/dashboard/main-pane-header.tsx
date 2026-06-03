@@ -12,12 +12,14 @@ export function MainPaneHeader({ list, openCount }: Props) {
                 <span className="text-base">📥</span>
             ) : (
                 <span
-                    className="inline-block w-2.5 h-2.5 rounded-full"
+                    className="inline-block h-2.5 w-2.5 rounded-full"
                     style={{ backgroundColor: list.color ?? '#999' }}
                 />
             )}
-            <h1 className="text-lg font-semibold tracking-tight">{list.name}</h1>
-            <span className="ml-auto text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200 rounded-full px-2 py-0.5">
+            <h1 className="text-lg font-semibold tracking-tight">
+                {list.name}
+            </h1>
+            <span className="ml-auto rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-900 dark:bg-amber-900/30 dark:text-amber-200">
                 {openCount} open
             </span>
         </div>

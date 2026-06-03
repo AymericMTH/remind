@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -32,6 +34,7 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+        $this->configureAuthentication();
     }
 
     /**
@@ -95,6 +98,37 @@ class FortifyServiceProvider extends ServiceProvider
             return Limit::perMinute(10)->by(
                 ($request->input('credential.id') ?: $request->session()->getId()).'|'.$request->ip(),
             );
+        });
+    }
+
+    /**
+     * Allow login by either email or username, and permit an empty password
+     * when the user's stored password is NULL (passwordless local accounts).
+     */
+    private function configureAuthentication(): void
+    {
+        Fortify::authenticateUsing(function (Request $request) {
+            $identifier = (string) $request->input(Fortify::username(), '');
+
+            if ($identifier === '') {
+                return null;
+            }
+
+            $user = User::where('email', $identifier)
+                ->orWhere('username', $identifier)
+                ->first();
+
+            if ($user === null) {
+                return null;
+            }
+
+            $submitted = (string) $request->input('password', '');
+
+            if ($user->password === null) {
+                return $submitted === '' ? $user : null;
+            }
+
+            return Hash::check($submitted, $user->password) ? $user : null;
         });
     }
 }

@@ -18,6 +18,16 @@ trait PasswordValidationRules
     }
 
     /**
+     * Rules for the "set OR clear" password flow.
+     *
+     * @return array<int, ValidationRule|array<mixed>|string>
+     */
+    protected function optionalPasswordRules(): array
+    {
+        return ['nullable', 'string', Password::default(), 'confirmed'];
+    }
+
+    /**
      * Get the validation rules used to validate the current password.
      *
      * @return array<int, ValidationRule|array<mixed>|string>

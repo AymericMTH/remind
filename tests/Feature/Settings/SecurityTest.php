@@ -115,4 +115,53 @@ class SecurityTest extends TestCase
             ->assertSessionHasErrors('current_password')
             ->assertRedirect(route('security.edit'));
     }
+
+    public function test_password_can_be_cleared_by_submitting_an_empty_value()
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->from(route('security.edit'))
+            ->put(route('user-password.update'), [
+                'current_password' => 'password',
+                'password' => '',
+                'password_confirmation' => '',
+            ]);
+
+        $response->assertSessionHasNoErrors()->assertRedirect(route('security.edit'));
+        $this->assertNull($user->refresh()->password);
+    }
+
+    public function test_passwordless_user_can_set_a_password_without_supplying_current_password()
+    {
+        $user = User::factory()->passwordless()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->from(route('security.edit'))
+            ->put(route('user-password.update'), [
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ]);
+
+        $response->assertSessionHasNoErrors()->assertRedirect(route('security.edit'));
+        $this->assertNotNull($user->refresh()->password);
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('new-password', $user->refresh()->password));
+    }
+
+    public function test_user_with_a_password_still_needs_current_password_to_update()
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->from(route('security.edit'))
+            ->put(route('user-password.update'), [
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ]);
+
+        $response->assertSessionHasErrors('current_password');
+    }
 }

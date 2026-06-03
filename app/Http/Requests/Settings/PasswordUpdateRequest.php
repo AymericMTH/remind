@@ -11,15 +11,18 @@ class PasswordUpdateRequest extends FormRequest
     use PasswordValidationRules;
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        return [
-            'current_password' => $this->currentPasswordRules(),
-            'password' => $this->passwordRules(),
+        $rules = [
+            'password' => $this->optionalPasswordRules(),
         ];
+
+        if ($this->user()->password !== null) {
+            $rules['current_password'] = $this->currentPasswordRules();
+        }
+
+        return $rules;
     }
 }

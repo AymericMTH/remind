@@ -13,6 +13,7 @@ type Props = {
     reminderCount: number;
     curatedColors: string[];
     onSelect: () => void;
+    isDropTarget?: boolean;
 };
 
 export function SidebarListItem({
@@ -21,6 +22,7 @@ export function SidebarListItem({
     reminderCount,
     curatedColors,
     onSelect,
+    isDropTarget = false,
 }: Props) {
     const [renaming, setRenaming] = useState(false);
     const [draft, setDraft] = useState(list.name);
@@ -88,6 +90,10 @@ export function SidebarListItem({
                     selected
                         ? 'border-l-current bg-amber-100 dark:bg-amber-900/30'
                         : 'border-l-transparent hover:bg-amber-50 dark:hover:bg-amber-950/20'
+                } ${
+                    isDropTarget
+                        ? 'bg-amber-200 ring-2 ring-amber-500 dark:bg-amber-800/50 dark:ring-amber-400'
+                        : ''
                 }`}
             >
                 <span className="text-sm">

@@ -41,6 +41,23 @@ class DashboardController extends Controller
             'reminders' => $reminders->map(fn ($r) => $this->presentReminder($r, $renderer))->values(),
             'completedReminders' => $completed->map(fn ($r) => $this->presentReminder($r, $renderer))->values(),
             'curatedColors' => config('remind.curated_colors'),
+            'globalReminders' => Inertia::optional(fn () => $user
+                ->reminders()
+                ->with('list:id,name,color,is_inbox')
+                ->orderByDesc('updated_at')
+                ->get()
+                ->map(fn ($r) => [
+                    'id' => $r->id,
+                    'title' => $r->title,
+                    'status' => $r->status,
+                    'list' => [
+                        'id' => $r->list->id,
+                        'name' => $r->list->name,
+                        'color' => $r->list->color,
+                        'is_inbox' => (bool) $r->list->is_inbox,
+                    ],
+                ])
+                ->values()),
         ]);
     }
 

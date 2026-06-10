@@ -9,7 +9,7 @@ use Illuminate\Validation\ValidationException;
 
 class UpdateReminder
 {
-    public function __construct(private NormalizeContext $normalizeContext = new NormalizeContext()) {}
+    public function __construct(private NormalizeContext $normalizeContext = new NormalizeContext) {}
 
     public function run(Reminder $reminder, array $attrs): Reminder
     {
@@ -31,7 +31,10 @@ class UpdateReminder
                     'list_id' => 'List not found.',
                 ]);
             }
-            $reminder->list_id = $list->id;
+            if ($list->id !== $reminder->list_id) {
+                $reminder->list_id = $list->id;
+                $reminder->position = (int) $list->reminders()->max('position') + 1;
+            }
         }
 
         if (array_key_exists('title', $data)) {

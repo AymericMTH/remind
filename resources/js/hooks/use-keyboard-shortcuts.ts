@@ -12,6 +12,8 @@ export type Shortcuts = {
     onJumpToInbox?: () => void;
     onEscape?: () => void;
     onCheatsheet?: () => void;
+    onSearchCurrent?: () => void;
+    onSearchAll?: () => void;
 };
 
 function isTextInputFocused(): boolean {
@@ -36,6 +38,18 @@ export function useKeyboardShortcuts(s: Shortcuts) {
 
     useEffect(() => {
         function onKey(e: KeyboardEvent) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+                e.preventDefault();
+
+                if (e.shiftKey) {
+                    s.onSearchAll?.();
+                } else {
+                    s.onSearchCurrent?.();
+                }
+
+                return;
+            }
+
             if (e.key === 'Escape') {
                 s.onEscape?.();
 

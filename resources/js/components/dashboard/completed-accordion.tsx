@@ -11,10 +11,17 @@ import type { Reminder } from '@/types/remind';
 
 type Props = {
     reminders: Reminder[];
+    forceOpen?: boolean;
 };
 
-export function CompletedAccordion({ reminders }: Props) {
-    const [open, setOpen] = useState(false);
+export function CompletedAccordion({ reminders, forceOpen = false }: Props) {
+    const [userOpen, setUserOpen] = useState(false);
+    const open = forceOpen || userOpen;
+    const setOpen = (v: boolean) => {
+        if (!forceOpen) {
+            setUserOpen(v);
+        }
+    };
 
     if (reminders.length === 0) {
         return null;

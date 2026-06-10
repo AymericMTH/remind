@@ -30,12 +30,25 @@ export type Reminder = {
     position: number;
 };
 
+export type GlobalReminderLite = {
+    id: number;
+    title: string;
+    status: 'open' | 'done';
+    list: {
+        id: number;
+        name: string;
+        color: string | null;
+        is_inbox: boolean;
+    };
+};
+
 export type DashboardPageProps = {
     lists: ReminderList[];
     selectedList: Pick<ReminderList, 'id' | 'name' | 'color' | 'is_inbox'>;
     reminders: Reminder[];
     completedReminders: Reminder[];
     curatedColors: string[];
+    globalReminders?: GlobalReminderLite[];
 };
 
 export type McpPageProps = {

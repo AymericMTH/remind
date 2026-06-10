@@ -81,4 +81,58 @@ class DashboardControllerTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->where('reminders.0.notes_html', fn ($html) => str_contains($html, '<strong>hi</strong>')));
     }
+
+    public function test_global_reminders_absent_on_normal_load(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get('/dashboard')
+            ->assertInertia(fn ($page) => $page->missing('globalReminders'));
+    }
+
+    public function test_global_reminders_present_on_partial_reload_and_user_scoped(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+        $work = ReminderList::factory()->create(['user_id' => $user->id, 'name' => 'Work']);
+        Reminder::factory()->create([
+            'user_id' => $user->id,
+            'list_id' => $user->lists()->first()->id,
+            'title' => 'mine 1',
+        ]);
+        Reminder::factory()->create([
+            'user_id' => $user->id,
+            'list_id' => $work->id,
+            'title' => 'mine 2',
+        ]);
+        Reminder::factory()->create([
+            'user_id' => $other->id,
+            'list_id' => $other->lists()->first()->id,
+            'title' => 'not mine',
+        ]);
+
+        $version = hash_file('xxh128', public_path('build/manifest.json'));
+
+        $response = $this->actingAs($user)
+            ->withHeaders([
+                'X-Inertia' => 'true',
+                'X-Inertia-Version' => $version,
+                'X-Inertia-Partial-Component' => 'dashboard/Index',
+                'X-Inertia-Partial-Data' => 'globalReminders',
+            ])
+            ->get('/dashboard')
+            ->assertOk();
+
+        $payload = $response->json();
+        $this->assertArrayHasKey('globalReminders', $payload['props']);
+        $items = $payload['props']['globalReminders'];
+        $this->assertCount(2, $items);
+        $titles = collect($items)->pluck('title')->all();
+        $this->assertEqualsCanonicalizing(['mine 1', 'mine 2'], $titles);
+        foreach ($items as $item) {
+            $this->assertArrayHasKey('list', $item);
+            $this->assertArrayHasKey('id', $item['list']);
+        }
+    }
 }
